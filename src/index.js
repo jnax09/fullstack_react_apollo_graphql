@@ -25,18 +25,10 @@ const isTest = !!process.env.TEST_DATABASE;
 
 mongoose
     .connect(
-        `mongodb://localhost:27017/${database}`, { useNewUrlParser: true }, () => {
+        `mongodb://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@ds143604.mlab.com:43604/${database}`, { useNewUrlParser: true }, () => {
             console.log('Connected to MongoDB...')
-
             if(isTest) seedData()
         })
-
-//  mongoose
-//     .connect(
-//         `mongodb://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@ds143604.mlab.com:43604/$  {process.env.DATABASE}`, { useNewUrlParser: true }, () => {
-//             console.log('Connected to MongoDB...')
-//             seedData()
-//         })
  
         
 //Verify incoming token before the request hits the graphql resolvers
