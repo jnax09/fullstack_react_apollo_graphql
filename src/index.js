@@ -22,14 +22,23 @@ app.use(cors())
 //Connect to database
 const database = process.env.TEST_DATABASE || process.env.DATABASE
 const isTest = !!process.env.TEST_DATABASE;
+// const isProduction = !!process.env.DATABASE_URL;
 
-mongoose
-    .connect(
-        `mongodb://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@ds143604.mlab.com:43604/${database}`, { useNewUrlParser: true }, () => {
-            console.log('Connected to MongoDB...')
-            if(isTest) seedData()
-        })
- 
+if (process.env.DATABASE_URL) {
+    mongoose
+        .connect(
+            process.env.DATABASE_URL, { useNewUrlParser: true }, () => {
+                console.log('Connected to MongoDB...')
+                seedData()
+            })
+} else {
+    mongoose
+        .connect(
+            `mongodb://localhost/${database}`, { useNewUrlParser: true }, () => {
+                console.log('Connected to MongoDB...')
+                if(isTest) seedData()
+            })
+}
         
 //Verify incoming token before the request hits the graphql resolvers
 const getMe = async req => {
@@ -77,6 +86,8 @@ server.applyMiddleware({ app, path: '/graphql' })
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
-httpServer.listen({ port: 8000 }, () => {
-    console.log('Apollo Server on http://localhost:8000/graphql')
+const port = process.env.PORT || 8000
+
+httpServer.listen({ port }, () => {
+    console.log(`Apollo Server on http://localhost:${port}/graphql`)
 })
