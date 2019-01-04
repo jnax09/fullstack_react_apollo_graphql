@@ -1,6 +1,8 @@
-import { gql } from 'apollo-server-express'
+import {
+    gql
+} from 'apollo-server-express'
 
-export default gql`
+export default gql `
     extend type Query {
         messages(cursor: String, limit: Int): MessageConnection!
         message(id: ID!): Message

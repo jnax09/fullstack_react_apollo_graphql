@@ -17,7 +17,7 @@ export const user = async variables =>
     variables,
   });
 
-  export const userByUsername = async variables =>
+export const userByUsername = async variables =>
   axios.post(API_URL, {
     query: `
       query ($username: String!) {
@@ -32,32 +32,30 @@ export const user = async variables =>
     variables,
   });
 
-  export const signIn = async variables =>
-    await axios.post(API_URL, {
-        query: `
+export const signIn = async variables =>
+  await axios.post(API_URL, {
+    query: `
             mutation ($login: String!, $password: String!) {
                 signIn(login: $login, password: $password) {
                     token
                 }
             }
             `,
-        variables,
-    });
+    variables,
+  });
 
-    export const deleteUser = async (variables, token) =>
-    axios.post(
-        API_URL,
-        {
-        query: `
+export const deleteUser = async (variables, token) =>
+  axios.post(
+    API_URL, {
+      query: `
             mutation ($id: ID!) {
                 deleteUser(id: $id)
             }
         `,
-        variables,
-        },
-        {
-            headers: {
-                'x-token': token,
-            },
-        },
-    );
+      variables,
+    }, {
+      headers: {
+        'x-token': token,
+      },
+    },
+  );

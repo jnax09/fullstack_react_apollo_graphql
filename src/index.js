@@ -1,8 +1,11 @@
-require ('dotenv').config()
+require('dotenv').config()
 
 import express from 'express'
 import http from 'http';
-import { ApolloServer, AuthenticationError } from 'apollo-server-express'
+import {
+    ApolloServer,
+    AuthenticationError
+} from 'apollo-server-express'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
@@ -27,19 +30,23 @@ const isTest = !!process.env.TEST_DATABASE;
 if (process.env.DATABASE_URL) {
     mongoose
         .connect(
-            process.env.DATABASE_URL, { useNewUrlParser: true }, () => {
+            process.env.DATABASE_URL, {
+                useNewUrlParser: true
+            }, () => {
                 console.log('Connected to MongoDB...')
                 seedData()
             })
 } else {
     mongoose
         .connect(
-            `mongodb://localhost/${database}`, { useNewUrlParser: true }, () => {
+            `mongodb://localhost/${database}`, {
+                useNewUrlParser: true
+            }, () => {
                 console.log('Connected to MongoDB...')
-                if(isTest) seedData()
+                seedData()
             })
 }
-        
+
 //Verify incoming token before the request hits the graphql resolvers
 const getMe = async req => {
     const token = req.headers['x-token']
@@ -53,43 +60,53 @@ const getMe = async req => {
     }
 }
 
+// const userLoader = new DataLoader(loaders.user.batchedUserFetching)
+
 const server = new ApolloServer({
     introspection: true,
     playground: true,
     typeDefs: schema,
     resolvers,
-    context: async ({ req, connection }) => {
+    context: async ({
+        req,
+        connection
+    }) => {
         if (connection) {
             return {
                 models,
                 loaders: {
-                    user: new DataLoader(keys => loaders.user.batchUsers(keys,models))
+                    user: new DataLoader(keys => loaders.user.batchedUserFetching(keys, models))
                 }
             };
         }
-    
+
         if (req) {
             const me = await getMe(req);
-    
+
             return {
                 models,
                 me,
                 secret: process.env.SECRET,
                 loaders: {
-                    user: new DataLoader(keys => loaders.user.batchUsers(keys,models))
+                    user: new DataLoader(keys => loaders.user.batchedUserFetching(keys, models))
                 }
             };
         }
     },
 })
 
-server.applyMiddleware({ app, path: '/graphql' })
+server.applyMiddleware({
+    app,
+    path: '/graphql'
+})
 
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 const port = process.env.PORT || 8000
 
-httpServer.listen({ port }, () => {
+httpServer.listen({
+    port
+}, () => {
     console.log(`Apollo Server on http://localhost:${port}/graphql`)
 })

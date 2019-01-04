@@ -27,12 +27,10 @@ const userSchema = new Schema({
     role: {
         type: String
     },
-    messages: [
-        { 
-            type: Schema.Types.ObjectId,
-            ref: 'Message'
-        }
-    ]
+    messages: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Message'
+    }]
 })
 
 //Hashing a password before saving it to the database
@@ -54,15 +52,26 @@ userSchema.methods.validatePassword = async function (password) {
 //Generate Token
 userSchema.methods.generateToken = async function (secret, expiresIn) {
     const user = this
-    const payload = { id: user._id, username: user.username, email: user.email, role: user.role }
-    return await jwt.sign(payload, secret, { expiresIn } )
+    const payload = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+    }
+    return await jwt.sign(payload, secret, {
+        expiresIn
+    })
 }
 
 //Static Methods
 userSchema.statics.findByLogin = async login => {
-    let user = await User.findOne({ username: login }) 
+    let user = await User.findOne({
+        username: login
+    })
     if (!user) {
-        user = await user.findOne({ email: login })
+        user = await user.findOne({
+            email: login
+        })
     }
     return user
 }

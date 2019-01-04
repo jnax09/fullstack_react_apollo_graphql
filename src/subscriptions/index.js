@@ -1,4 +1,6 @@
-import { PubSub } from 'apollo-server';
+import {
+  PubSub
+} from 'apollo-server';
 
 import * as MESSAGE_EVENTS from './message';
 
